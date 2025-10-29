@@ -3,7 +3,7 @@ package ec.edu.ups;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EncriptarBit <T> implements AlgoritmoEncriptacion <List<T> , String>{
+public class EncriptarBit<T> implements AlgoritmoEncriptacion<List<T>, String> {
 
     private List<String> listaTexto = new ArrayList<>();
     private List<String> listaLlave = new ArrayList<>();
@@ -14,100 +14,105 @@ public class EncriptarBit <T> implements AlgoritmoEncriptacion <List<T> , String
     private List<String> compararXorBit = new ArrayList<>();
     private List<String> xorMostrar = new ArrayList<>();
     private List<String> numeroXor = new ArrayList<>();
-    private String resultado;
 
     @Override
-    public String encriptar(String texto, String llave) {
+    public List<T> encriptar(List<T> texto, String llave) {
+
+        // Limpiar listas en caso de múltiples ejecuciones
+        listaTexto.clear();
+        listaLlave.clear();
+        textoAscii.clear();
+        llaveAscii.clear();
+        binarioTexto.clear();
+        binarioLlave.clear();
+        compararXorBit.clear();
+        xorMostrar.clear();
+        numeroXor.clear();
+
+        List<T> resultado = new ArrayList<>();
 
         // Lista que guarda letra por letra del texto original
-        for (int i = 0; i < texto.length(); i++) {
-            listaTexto.add(String.valueOf(texto.charAt(i)));
+        for (int i = 0; i < texto.size(); i++) {
+            listaTexto.add(String.valueOf(texto.get(i)));
         }
 
         // Lista que guarda letra por letra de la llave original
-        for (int i = 0; i < texto.length(); i++) {
+        for (int i = 0; i < texto.size(); i++) {
             listaLlave.add(String.valueOf(llave.charAt(i % llave.length())));
         }
 
         // Lista que guarda el ascii de texto
-        for (int i = 0; i < texto.length(); i++) {
-            textoAscii.add((int) texto.charAt(i));
+        for (int i = 0; i < texto.size(); i++) {
+            textoAscii.add((int) listaTexto.get(i).charAt(0));
         }
 
         // Lista que guarda el ascii de la llave
-        for (int i = 0; i < texto.length(); i++) {
+        for (int i = 0; i < texto.size(); i++) {
             llaveAscii.add((int) listaLlave.get(i).charAt(0));
         }
 
         // Lista que guarda el binario de un texto
-        for (int i = 0; i < textoAscii.size(); i++) {
-            String binario = Integer.toBinaryString(textoAscii.get(i));
-            binarioTexto.add(binario);
+        for (int valor : textoAscii) {
+            binarioTexto.add(Integer.toBinaryString(valor));
         }
 
         // Lista que guarda el binario de la llave
-        for (int i = 0; i < llaveAscii.size(); i++) {
-            String binario = Integer.toBinaryString(llaveAscii.get(i));
-            binarioLlave.add(binario);
+        for (int valor : llaveAscii) {
+            binarioLlave.add(Integer.toBinaryString(valor));
         }
 
-        // Lista que guarda la comparacion bit x bit de ascii del texto
-        for (int i = 0; i < texto.length(); i++) {
+        // XOR bit a bit
+        for (int i = 0; i < texto.size(); i++) {
             int t = textoAscii.get(i);
             int k = llaveAscii.get(i);
             int xor = t ^ k;
 
             String binario = String.format("%8s", Integer.toBinaryString(xor)).replace(' ', '0');
-
             xorMostrar.add(binario);
             compararXorBit.add(String.valueOf(xor));
+
+            // Guardamos el XOR como tipo genérico
+            resultado.add((T) (Integer) xor);
         }
 
-        // Lista que guarda el número normal del XOR
-        for (int i = 0; i < compararXorBit.size(); i++) {
-            String binario = Integer.toBinaryString(Integer.parseInt(compararXorBit.get(i)));
-            numeroXor.add(binario);
-        }
+        mostrarResultados(String.join("", listaTexto), llave);
 
-        resultado = String.join("",String.valueOf(compararXorBit));
-
-        mostrarResultados(texto, llave);
         return resultado;
     }
 
     public void mostrarResultados(String texto, String llave) {
-
         System.out.println("=".repeat(33));
         System.out.println("ALGORITMO POR BIT");
         System.out.println("=".repeat(33));
         System.out.println("\n1- Datos de entrada");
-        System.out.println("Texto original-> " + texto);
-        System.out.println("Llave-> " + llave + listaLlave);
+        System.out.println("Texto original -> " + texto);
+        System.out.println("Llave -> " + llave + " " + listaLlave);
 
         System.out.println("\n2- PROCESO");
         System.out.println("-".repeat(33));
         System.out.println(" Caracter     ASCII     Binario");
 
-        for (int i = 0; i < texto.length(); i++) {
-            System.out.println("|" + " ".repeat(2) + listaTexto.get(i) + " ".repeat(11) + textoAscii.get(i) +
-                    " ".repeat(6) + binarioTexto.get(i) + " ".repeat(2) + "|");
+        for (int i = 0; i < listaTexto.size(); i++) {
+            System.out.println("| " + listaTexto.get(i) + " ".repeat(10) + textoAscii.get(i) +
+                    " ".repeat(6) + binarioTexto.get(i) + " |");
         }
 
         System.out.println("-".repeat(33));
-
         System.out.println(" Caracter     ASCII     Binario");
-        for (int i = 0; i < listaLlave.size(); i++) {
-            System.out.println("|" + " ".repeat(2) + listaLlave.get(i) + " ".repeat(11) + llaveAscii.get(i) +
-                    " ".repeat(6) + binarioLlave.get(i) + " ".repeat(2) + "|");
-        }
-        System.out.println("-".repeat(33));
 
+        for (int i = 0; i < listaLlave.size(); i++) {
+            System.out.println("| " + listaLlave.get(i) + " ".repeat(10) + llaveAscii.get(i) +
+                    " ".repeat(6) + binarioLlave.get(i) + " |");
+        }
+
+        System.out.println("-".repeat(33));
         System.out.println("       Proceso     Resultado");
-        for (int i = 0; i < numeroXor.size(); i++) {
+
+        for (int i = 0; i < compararXorBit.size(); i++) {
             System.out.println(" ".repeat(7) + xorMostrar.get(i) + " ".repeat(6) + compararXorBit.get(i));
         }
-        System.out.println("-".repeat(33));
 
-        System.out.println("3. Salida");
+        System.out.println("-".repeat(33));
+        System.out.println("3. Salida.");
     }
 }
